@@ -80,3 +80,41 @@ exports.login = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+exports.getProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select("-password");
+        if (!user) return res.status(404).json({ message: "User not found" });
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.updateProfileLocation = async (req, res) => {
+    try {
+        const { latitude, longitude, serviceRadiusKm, address, hubLocation, materialsAccepted } = req.body;
+        const update = {};
+
+        if (latitude !== undefined && longitude !== undefined) {
+            update.locationCoordinates = {
+                latitude: Number(latitude),
+                longitude: Number(longitude)
+            };
+        }
+        if (serviceRadiusKm !== undefined) update.serviceRadiusKm = Number(serviceRadiusKm);
+        if (address !== undefined) update.address = address;
+        if (hubLocation !== undefined) update.hubLocation = hubLocation;
+        if (materialsAccepted !== undefined) update.materialsAccepted = materialsAccepted;
+
+        const updated = await User.findByIdAndUpdate(
+            req.user.id,
+            { $set: update },
+            { new: true }
+        ).select("-password");
+
+        res.json({ success: true, user: updated });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

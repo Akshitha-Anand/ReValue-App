@@ -2,10 +2,20 @@ const jwt = require("jsonwebtoken");
 
 const authMiddleware = (req, res, next) => {
     try {
-        const token = req.header("Authorization");
-        if (!token) return res.status(401).json({ message: "No token, authorization denied" });
+        const authHeader = req.header("Authorization");
+        if (!authHeader) return res.status(401).json({ message: "No token, authorization denied" });
 
-        const decoded = jwt.verify(token.replace("Bearer ", ""), "secret");
+        const rawToken = authHeader.replace(/^Bearer\s+/i, "").trim();
+        const secret = process.env.JWT_SECRET || "your_jwt_secret";
+
+        let decoded;
+        try {
+            decoded = jwt.verify(rawToken, secret);
+        } catch (e) {
+            // Support legacy fallback secret if configured differently
+            decoded = jwt.verify(rawToken, "secret");
+        }
+
         req.user = decoded;
         next();
     } catch (error) {

@@ -13,6 +13,8 @@ import Profile from './pages/Profile';
 import CollectorHub from './pages/CollectorHub';
 import Organizations from './pages/Organizations';
 import Feedback from './pages/Feedback';
+import Notifications from './pages/Notifications';
+import IndustryMatches from './pages/IndustryMatches';
 import './index.css';
 
 const ProtectedRoute = ({ children }) => {
@@ -57,6 +59,8 @@ function App() {
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/profile/:id" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/hub" element={<ProtectedRoute><CollectorHub /></ProtectedRoute>} />
+          <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+          <Route path="/matches" element={<RoleProtectedRoute allowedRoles={['industry']}><IndustryMatches /></RoleProtectedRoute>} />
           <Route path="/organizations" element={<RoleProtectedRoute allowedRoles={['collector', 'industry']}><Organizations /></RoleProtectedRoute>} />
           <Route path="/collectors" element={<RoleProtectedRoute allowedRoles={['collector', 'industry']}><Organizations /></RoleProtectedRoute>} />
           <Route path="/feedback" element={<ProtectedRoute><Feedback /></ProtectedRoute>} />

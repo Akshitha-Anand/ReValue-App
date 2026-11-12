@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { UploadCloud, CheckCircle, Loader, Sparkles, AlertTriangle, MapPin } from 'lucide-react';
+import { UploadCloud, CheckCircle, Loader, Sparkles, AlertTriangle, MapPin, Navigation, Locate } from 'lucide-react';
 import axios from 'axios';
 import API_BASE_URL from '../api';
 import './CreatePost.css';
@@ -47,10 +47,59 @@ const CreatePost = () => {
     const [imagePreview, setImagePreview] = useState(null);
     const [aiState, setAiState] = useState({ loading: false, result: null });
     const [submitted, setSubmitted] = useState(false);
+    const [coords, setCoords] = useState({ latitude: null, longitude: null });
+    const [geoStatus, setGeoStatus] = useState('idle'); // idle | loading | success | error
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(p => ({ ...p, [name]: value }));
+    };
+
+    const runAiClassification = async (file, titleHint = '', descHint = '') => {
+        setAiState({ loading: true, result: null });
+        if (file) {
+            try {
+                const aiForm = new FormData();
+                aiForm.append('image', file);
+                const hint = `${titleHint} ${descHint}`.trim();
+                if (hint) {
+                    aiForm.append('hint', hint);
+                }
+                const res = await axios.post(`${API_BASE_URL}/api/ai/classify`, aiForm, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                    },
+                    timeout: 8000
+                });
+
+                if (res.data && res.data.success) {
+                    const cat = res.data.suggested_category || res.data.category;
+                    const conf = Math.round((res.data.confidence || 0.8) * 100);
+                    setAiState({
+                        loading: false,
+                        result: {
+                            category: cat,
+                            confidence: conf,
+                            tip: res.data.recycling_tip,
+                            modelStatus: res.data.model_status
+                        }
+                    });
+                    setFormData(p => ({ ...p, category: cat }));
+                    return;
+                }
+            } catch (err) {
+                console.warn('Backend ML inference fallback to keyword analysis:', err.message);
+            }
+        }
+
+        // Fast keyword classifier fallback
+        setTimeout(() => {
+            const hint = (file ? file.name : '') + ' ' + titleHint;
+            const result = classifyWaste(hint, descHint);
+            setAiState({ loading: false, result });
+            setFormData(p => ({ ...p, category: result.category }));
+        }, 800);
     };
 
     const handleImageChange = (e) => {
@@ -61,24 +110,29 @@ const CreatePost = () => {
         reader.onloadend = () => setImagePreview(reader.result);
         reader.readAsDataURL(file);
 
-        // Start AI classification using filename as hint (demo)
-        setAiState({ loading: true, result: null });
-        setTimeout(() => {
-            const result = classifyWaste(file.name + ' ' + formData.title, formData.description);
-            setAiState({ loading: false, result });
-            setFormData(p => ({ ...p, category: result.category }));
-        }, 1800);
+        runAiClassification(file, formData.title, formData.description);
     };
 
     const handleDescriptionBlur = () => {
-        if (formData.title || formData.description) {
-            setAiState({ loading: true, result: null });
-            setTimeout(() => {
-                const result = classifyWaste(formData.title, formData.description);
-                setAiState({ loading: false, result });
-                setFormData(p => ({ ...p, category: result.category }));
-            }, 1000);
+        if (!aiState.result && (formData.title || formData.description)) {
+            runAiClassification(imageFile, formData.title, formData.description);
         }
+    };
+
+    const handleDetectLocation = () => {
+        if (!navigator.geolocation) {
+            setGeoStatus('error');
+            return;
+        }
+        setGeoStatus('loading');
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                setCoords({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+                setGeoStatus('success');
+            },
+            () => setGeoStatus('error'),
+            { timeout: 10000 }
+        );
     };
 
     const handleSubmit = async (e) => {
@@ -89,6 +143,17 @@ const CreatePost = () => {
             Object.keys(formData).forEach(key => payload.append(key, formData[key]));
             if (imageFile) {
                 payload.append('image', imageFile);
+            }
+            // Append GPS coordinates if captured
+            if (coords.latitude !== null) {
+                payload.append('latitude', coords.latitude);
+                payload.append('longitude', coords.longitude);
+            }
+            // Append AI prediction metadata
+            if (aiState.result) {
+                payload.append('aiPredictedCategory', aiState.result.category);
+                payload.append('aiConfidence', aiState.result.confidence);
+                payload.append('isConfirmedByUser', 'true');
             }
 
             await axios.post(`${API_BASE_URL}/api/posts`, payload, {
@@ -157,12 +222,7 @@ const CreatePost = () => {
                         {/* AI Status Box */}
                         {!aiState.loading && !aiState.result && (
                             <button type="button" className="btn btn-outline" style={{ width: '100%', display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center' }} onClick={() => {
-                                setAiState({ loading: true, result: null });
-                                setTimeout(() => {
-                                    const result = classifyWaste(formData.title || 'waste', formData.description);
-                                    setAiState({ loading: false, result });
-                                    setFormData(p => ({ ...p, category: result.category }));
-                                }, 1500);
+                                runAiClassification(imageFile, formData.title || 'waste', formData.description);
                             }}>
                                 <Sparkles size={18} /> Auto-Classify with AI
                             </button>
@@ -173,29 +233,32 @@ const CreatePost = () => {
                                 <Loader size={20} className="spin" />
                                 <div>
                                     <p className="ai-title">AI Vision Model Running...</p>
-                                    <p className="ai-sub">Scanning image & parsing text...</p>
+                                    <p className="ai-sub">Scanning image & analyzing waste features...</p>
                                 </div>
                             </div>
                         )}
 
                         {aiState.result && !aiState.loading && (
                             <div className="ai-box success">
-                                <div className="ai-icon">{categoryInfo[aiState.result.category]?.icon}</div>
+                                <div className="ai-icon">{categoryInfo[aiState.result.category]?.icon || '♻️'}</div>
                                 <div>
                                     <p className="ai-title"><CheckCircle size={14} /> AI Match: <strong>{aiState.result.category.toUpperCase()}</strong></p>
                                     <div className="confidence-bar-wrap">
                                         <div className="confidence-bar" style={{ width: `${aiState.result.confidence}%` }}></div>
                                     </div>
-                                    <p className="ai-sub">{aiState.result.confidence}% confidence score</p>
+                                    <p className="ai-sub">
+                                        {aiState.result.confidence}% confidence score
+                                        {aiState.result.modelStatus === 'mobilenetv2_trained' && ' • MobileNetV2'}
+                                    </p>
                                 </div>
                             </div>
                         )}
 
                         {/* Category Tip */}
-                        {info && (
+                        {(aiState.result?.tip || info?.tip) && (
                             <div className="category-tip">
                                 <Sparkles size={16} color="#f59e0b" />
-                                <p>{info.tip}</p>
+                                <p>{aiState.result?.tip || info?.tip}</p>
                             </div>
                         )}
                     </div>
@@ -268,6 +331,40 @@ const CreatePost = () => {
                                 <label>Pincode</label>
                                 <input type="text" name="pincode" value={formData.pincode} onChange={handleChange} placeholder="560034" maxLength={6} />
                             </div>
+                        </div>
+
+                        {/* GPS Coordinates Capture */}
+                        <div className="form-group">
+                            <label>GPS Location <span className="optional-tag">(Recommended — enables nearby collector alerts)</span></label>
+                            <div className="gps-row">
+                                <button
+                                    type="button"
+                                    className={`btn btn-outline gps-btn ${geoStatus}`}
+                                    onClick={handleDetectLocation}
+                                    disabled={geoStatus === 'loading'}
+                                >
+                                    {geoStatus === 'loading' ? (
+                                        <><Loader size={16} className="spin" /> Detecting...</>
+                                    ) : geoStatus === 'success' ? (
+                                        <><CheckCircle size={16} color="#10b981" /> Location Captured!</>
+                                    ) : geoStatus === 'error' ? (
+                                        <><AlertTriangle size={16} color="#ef4444" /> Try Again</>
+                                    ) : (
+                                        <><MapPin size={16} /> Detect My Location</>
+                                    )}
+                                </button>
+                                {coords.latitude !== null && (
+                                    <span className="gps-coords">
+                                        📍 {coords.latitude.toFixed(5)}, {coords.longitude.toFixed(5)}
+                                    </span>
+                                )}
+                            </div>
+                            {geoStatus === 'success' && (
+                                <p className="gps-success-msg">✅ Nearby collectors will be automatically notified when you post!</p>
+                            )}
+                            {geoStatus === 'error' && (
+                                <p className="gps-error-msg">❌ Location access denied. Enable browser location or enter coordinates manually.</p>
+                            )}
                         </div>
 
                         <div className="form-group">

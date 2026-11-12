@@ -26,9 +26,17 @@ const userSchema = new mongoose.Schema({
     },
     hubLocation: { type: String, trim: true },         // physical hub address / city
     areasServed: { type: [String], default: [] },       // areas/zones covered
-    materialsAccepted: { type: [String], default: [] }, // plastic, paper, metal, ewaste, glass
+    materialsAccepted: { type: [String], default: ["plastic", "paper", "metal", "glass", "ewaste", "organic"] }, // materials they collect
     vehicleType: String,                                // bike / truck / auto
     operatingHours: String,                             // e.g. "9am-6pm Mon-Sat"
+    serviceRadiusKm: { type: Number, default: 5 },     // search radius (default 5 km, configurable)
+    isAvailable: { type: Boolean, default: true },      // active status for accepting jobs
+
+    // ─── Location Coordinates (Opt-in) ───────────────
+    locationCoordinates: {
+        latitude: { type: Number, default: null },
+        longitude: { type: Number, default: null }
+    },
 
     // ─── Industry / Organization Fields ─────────────
     industryType: { type: String, trim: true },         // Plastic Recycling, E-Waste, etc.
@@ -36,6 +44,8 @@ const userSchema = new mongoose.Schema({
     companyWebsite: String,
     materialsRequired: { type: [String], default: [] }, // what they want to buy
     monthlyDemand: String,                              // e.g. "50 Tons/month"
+    minQuantityRequired: { type: Number, default: 10 }, // minimum required quantity in kg
+    qualityPreference: { type: String, default: "any" }, // any, clean, sorted, high
     businessAddress: String,
     contactPerson: String,                              // point-of-contact name
 
@@ -48,5 +58,8 @@ const userSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 
 });
+
+userSchema.index({ role: 1, isAvailable: 1 });
+userSchema.index({ "locationCoordinates.latitude": 1, "locationCoordinates.longitude": 1 });
 
 module.exports = mongoose.model("User", userSchema);

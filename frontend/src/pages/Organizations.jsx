@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { demoCollectors, demoOrganizations } from '../data/demoData';
 import { MessageSquare, MapPin, Star, CheckCircle, Search, Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
