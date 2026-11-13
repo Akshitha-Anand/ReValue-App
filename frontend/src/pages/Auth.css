@@ -1,117 +1,142 @@
+/* Auth.css */
 .auth-container {
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    padding: 2rem;
-    background: radial-gradient(circle at top left, var(--bg-secondary), var(--bg-primary) 70%);
+    padding: 2rem 1rem;
+    background: radial-gradient(circle at 50% 20%, rgba(16, 185, 129, 0.12) 0%, rgba(7, 21, 16, 0.98) 75%);
 }
 
 .auth-card {
     width: 100%;
-    max-width: 450px;
+    max-width: 480px;
     padding: 3rem 2.5rem;
+    border-radius: var(--radius-lg);
+    background: rgba(13, 34, 26, 0.85);
+    border: 1px solid rgba(16, 185, 129, 0.28);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), 0 0 30px rgba(16, 185, 129, 0.1);
 }
 
 .auth-header {
     text-align: center;
-    margin-bottom: 2.5rem;
+    margin-bottom: 2rem;
 }
 
 .auth-logo {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
 }
 
 .auth-logo h1 {
     margin-bottom: 0;
-    font-size: 2.5rem;
+    font-size: 2.2rem;
+    font-weight: 800;
 }
 
 .auth-header p {
     color: var(--text-secondary);
+    font-size: 0.95rem;
 }
 
 .auth-form {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .auth-btn {
     width: 100%;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     margin-top: 1rem;
+    padding: 0.85rem;
 }
 
 .auth-footer {
     text-align: center;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
+    color: var(--text-secondary);
+}
+
+.auth-footer a {
+    color: var(--accent-mint);
+    font-weight: 700;
 }
 
 .auth-error {
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--danger);
-    padding: 0.75rem;
-    border-radius: 8px;
+    background: rgba(239, 68, 68, 0.12);
+    color: #fca5a5;
+    padding: 0.85rem;
+    border-radius: var(--radius-md);
     margin-bottom: 1.5rem;
     text-align: center;
     border: 1px solid rgba(239, 68, 68, 0.3);
+    font-size: 0.88rem;
+    font-weight: 500;
 }
 
 .role-selector {
-    display: flex;
-    gap: 1rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
     margin-bottom: 1.5rem;
 }
 
 .role-option {
-    flex: 1;
-    padding: 1rem;
+    padding: 0.85rem 0.5rem;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     text-align: center;
     cursor: pointer;
-    background: rgba(15, 23, 42, 0.6);
-    transition: all 0.3s ease;
+    background: rgba(7, 21, 16, 0.6);
+    transition: all 0.25s ease;
 }
 
 .role-option.selected {
-    border-color: var(--accent-primary);
-    background: rgba(16, 185, 129, 0.15);
-    box-shadow: inset 0 0 0 1px var(--accent-primary);
+    border-color: var(--accent-mint);
+    background: rgba(16, 185, 129, 0.18);
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.25);
 }
 
 .role-option h3 {
-    font-size: 1rem;
-    margin-bottom: 0.25rem;
+    font-size: 0.92rem;
+    margin-bottom: 0.2rem;
+    color: var(--text-primary);
 }
 
 .role-option p {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
+    font-size: 0.72rem;
+    color: var(--text-muted);
 }
 
 .role-btn {
     flex: 1;
-    padding: 0.6rem;
-    background: var(--bg-secondary);
+    padding: 0.65rem;
+    background: rgba(7, 21, 16, 0.6);
     border: 1px solid var(--border-color);
     color: var(--text-secondary);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
 }
 
 .role-btn:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(16, 185, 129, 0.08);
+    color: var(--text-primary);
 }
 
 .role-btn.active {
-    background: rgba(16, 185, 129, 0.15);
-    border-color: var(--accent-primary);
-    color: var(--accent-primary);
+    background: rgba(16, 185, 129, 0.2);
+    border-color: var(--accent-mint);
+    color: var(--accent-mint);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+}
+
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 2rem 1.5rem;
+    }
 }

@@ -1,57 +1,60 @@
+/* CreatePost.css */
 .create-post-page {
     width: 100%;
-    max-width: 1050px;
+    max-width: 1100px;
     margin: 0 auto;
 }
 
 .post-form-wrapper {
-    padding: 2.5rem;
+    padding: 2.75rem;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    background: var(--bg-card);
 }
 
 .post-form {
-    display: flex;
-    gap: 3rem;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 2.5rem;
     align-items: flex-start;
 }
 
 .form-left {
-    flex: 0 0 300px;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.25rem;
 }
 
 .form-right {
-    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
 }
 
 .form-row {
     display: flex;
-    gap: 1.5rem;
+    gap: 1.25rem;
 }
 
-.flex-1 {
-    flex: 1;
-}
+.flex-1 { flex: 1; }
+.flex-2 { flex: 2; }
 
-.flex-2 {
-    flex: 2;
-}
-
+/* Image Upload Dropzone */
 .image-upload-box {
     display: block;
-    border: 2px dashed rgba(255, 255, 255, 0.2);
-    border-radius: 14px;
-    height: 240px;
+    border: 2px dashed rgba(16, 185, 129, 0.35);
+    border-radius: var(--radius-lg);
+    height: 250px;
     position: relative;
     overflow: hidden;
-    background: rgba(15, 23, 42, 0.4);
+    background: rgba(7, 21, 16, 0.6);
     cursor: pointer;
-    transition: border-color 0.3s;
+    transition: all 0.25s ease;
 }
 
 .image-upload-box:hover {
-    border-color: var(--accent-secondary);
+    border-color: var(--accent-mint);
+    background: rgba(16, 185, 129, 0.05);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
 }
 
 .upload-placeholder {
@@ -62,243 +65,204 @@
     height: 100%;
     gap: 0.75rem;
     color: var(--text-secondary);
+    text-align: center;
+    padding: 1rem;
 }
 
-.upload-placeholder p {
-    font-size: 0.9rem;
+.upload-icon {
+    color: var(--accent-mint);
 }
 
-.file-hint {
-    font-size: 0.75rem;
-    opacity: 0.6;
+.upload-sub {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.image-preview-wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 
 .image-preview {
     width: 100%;
     height: 100%;
-    background-size: cover;
-    background-position: center;
+    object-fit: cover;
 }
 
-.preview-overlay {
+.remove-img-btn {
     position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.55);
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-full);
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    font-size: 1.2rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s;
-    font-weight: 600;
-    font-size: 0.9rem;
 }
 
-.image-upload-box:hover .preview-overlay {
-    opacity: 1;
-}
-
-/* AI Box */
-.ai-box {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    padding: 1rem 1.25rem;
-    border-radius: 12px;
-    font-size: 0.9rem;
-}
-
-.ai-box.loading {
-    background: rgba(14, 165, 233, 0.1);
-    border: 1px solid rgba(14, 165, 233, 0.25);
-    color: var(--accent-secondary);
-}
-
-.ai-box.success {
-    background: rgba(16, 185, 129, 0.1);
+/* AI Classification Card */
+.ai-status-card {
+    padding: 1.25rem;
+    border-radius: var(--radius-md);
+    background: rgba(16, 185, 129, 0.08);
     border: 1px solid rgba(16, 185, 129, 0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
-.ai-icon {
-    font-size: 1.5rem;
-}
-
-.ai-title {
-    font-weight: 600;
-    margin-bottom: 0.35rem;
+.ai-status-header {
     display: flex;
     align-items: center;
+    gap: 0.5rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--accent-mint);
+}
+
+.ai-category-badge {
+    display: inline-flex;
+    align-items: center;
     gap: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
 }
 
-.ai-sub {
-    color: var(--text-secondary);
+.ai-confidence-pill {
+    font-size: 0.75rem;
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--accent-mint);
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-full);
+    font-weight: 700;
+}
+
+.ai-tip {
     font-size: 0.8rem;
-    margin-top: 0.25rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    margin: 0;
 }
 
-.confidence-bar-wrap {
-    height: 5px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
-    margin: 0.4rem 0;
+/* Category Grid Selector */
+.category-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
 }
 
-.confidence-bar {
-    height: 100%;
-    background: var(--accent-primary);
-    border-radius: 3px;
-    transition: width 0.6s ease;
+.cat-picker-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.85rem 0.5rem;
+    border-radius: var(--radius-md);
+    background: rgba(7, 21, 16, 0.6);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+    font-size: 0.82rem;
 }
 
-.category-tip {
+.cat-picker-btn:hover {
+    border-color: var(--accent-mint);
+    color: var(--text-primary);
+    background: rgba(16, 185, 129, 0.08);
+}
+
+.cat-picker-btn.active {
+    border-color: var(--accent-mint);
+    background: rgba(16, 185, 129, 0.18);
+    color: var(--accent-mint);
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.25);
+}
+
+.cat-icon {
+    font-size: 1.3rem;
+}
+
+/* Geo-Location Input Group */
+.geo-input-group {
     display: flex;
     gap: 0.75rem;
-    align-items: flex-start;
-    padding: 1rem;
-    background: rgba(245, 158, 11, 0.08);
-    border: 1px solid rgba(245, 158, 11, 0.2);
-    border-radius: 10px;
+}
+
+.geo-btn {
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0 1.25rem;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: var(--accent-mint);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 600;
     font-size: 0.85rem;
-    color: var(--text-secondary);
-    line-height: 1.5;
+    transition: all 0.2s;
 }
 
-.spin {
-    animation: rotate 1.5s linear infinite;
+.geo-btn:hover {
+    background: rgba(16, 185, 129, 0.22);
+    border-color: var(--accent-mint);
 }
 
-@keyframes rotate {
-    from {
-        transform: rotate(0);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
+/* Price Range Inputs */
+.price-range-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
 }
 
-.submit-btn {
-    width: 100%;
-    font-size: 1.1rem;
-    padding: 1rem;
-    margin-top: 0.5rem;
+.price-sep {
+    color: var(--text-muted);
+    font-weight: 600;
 }
 
-/* Success Screen */
-.success-screen {
-    padding: 4rem 3rem;
+/* Success State */
+.success-banner {
+    padding: 3rem 2rem;
     text-align: center;
-    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
 }
 
-.success-icon {
-    font-size: 4rem;
-    margin-bottom: 1.5rem;
+.success-icon-wrap {
+    width: 68px;
+    height: 68px;
+    border-radius: var(--radius-full);
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-mint);
 }
 
-.success-screen h2 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-}
-
-.success-screen p {
-    color: var(--text-secondary);
-    line-height: 1.7;
-    margin-bottom: 2rem;
-}
-
-.loader-bar {
-    height: 4px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.loader-bar::after {
-    content: '';
-    display: block;
-    height: 100%;
-    width: 100%;
-    background: var(--accent-gradient);
-    animation: load-slide 2s ease forwards;
-}
-
-@keyframes load-slide {
-    from {
-        transform: translateX(-100%);
-    }
-
-    to {
-        transform: translateX(0);
-    }
-}
-
-@media (max-width: 800px) {
+@media (max-width: 900px) {
     .post-form {
-        flex-direction: column;
+        grid-template-columns: 1fr;
     }
-
-    .form-left {
-        flex: 1;
-        width: 100%;
-    }
-
     .form-row {
         flex-direction: column;
-        gap: 0;
+        gap: 0.5rem;
+    }
+    .category-picker-grid {
+        grid-template-columns: repeat(3, 1fr);
     }
 }
-
-/* GPS Location Styles */
-.optional-tag {
-    font-size: 0.72rem;
-    color: var(--text-muted);
-    font-weight: 400;
-    margin-left: 0.3rem;
-}
-
-.gps-row {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-}
-
-.gps-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.85rem;
-}
-
-.gps-btn.success {
-    border-color: rgba(16,185,129,0.5);
-    color: #10b981;
-}
-
-.gps-btn.error {
-    border-color: rgba(239,68,68,0.4);
-    color: #ef4444;
-}
-
-.gps-coords {
-    font-size: 0.78rem;
-    color: var(--text-secondary);
-    background: var(--glass-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 0.25rem 0.6rem;
-    font-family: monospace;
-}
-
-.gps-success-msg {
-    font-size: 0.78rem;
-    color: #10b981;
-    margin: 0.35rem 0 0;
-}
-
-.gps-error-msg {
-    font-size: 0.78rem;
-    color: #ef4444;
-    margin: 0.35rem 0 0;
-}

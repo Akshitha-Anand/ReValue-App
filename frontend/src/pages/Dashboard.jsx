@@ -1,37 +1,63 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate as useNav } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
     Chart as ChartJS,
     CategoryScale, LinearScale, PointElement, LineElement,
     BarElement, Title, Tooltip, Legend, ArcElement, Filler
 } from 'chart.js';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
-import { Leaf, Recycle, Users, Building, Activity, TrendingUp, Wind, PlusCircle, ArrowRight, Package, ShoppingCart } from 'lucide-react';
-import { dashboardStats } from '../data/demoData';
+import {
+    Leaf, Recycle, Users, Building2, Activity, TrendingUp,
+    Wind, PlusCircle, ArrowRight, Package, ShoppingBag,
+    ShieldCheck, Sparkles, CheckCircle2, MapPin, Zap
+} from 'lucide-react';
+import { dashboardStats, demoPosts } from '../data/demoData';
 import './Dashboard.css';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Filler, Title, Tooltip, Legend);
 
 const chartDefaults = {
+    responsive: true,
+    maintainAspectRatio: false,
     scales: {
-        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
-        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+        y: {
+            grid: { color: 'rgba(16, 185, 129, 0.08)' },
+            ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 11 } }
+        },
+        x: {
+            grid: { display: false },
+            ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 11 } }
+        }
     },
-    plugins: { legend: { labels: { color: '#f1f5f9', font: { size: 13 } } } }
+    plugins: {
+        legend: {
+            position: 'top',
+            labels: { color: '#e2e8f0', font: { family: 'Plus Jakarta Sans', size: 12, weight: '600' }, boxWidth: 12, padding: 15 }
+        },
+        tooltip: {
+            backgroundColor: 'rgba(7, 21, 16, 0.95)',
+            borderColor: 'rgba(16, 185, 129, 0.3)',
+            borderWidth: 1,
+            titleColor: '#34d399',
+            bodyColor: '#f1f5f9',
+            padding: 10,
+            cornerRadius: 8
+        }
+    }
 };
 
 const Dashboard = () => {
     const { user } = useAuth();
-    const navigate = useNav();
+    const navigate = useNavigate();
 
     const stats = [
-        { title: 'Total Waste Listed', value: dashboardStats.totalWasteListed, icon: <Leaf size={26} />, color: '#10b981', bg: 'rgba(16,185,129,0.12)' },
-        { title: 'Waste Recycled', value: dashboardStats.totalWasteRecycled, icon: <Recycle size={26} />, color: '#0ea5e9', bg: 'rgba(14,165,233,0.12)' },
-        { title: 'Active Collectors', value: dashboardStats.activeCollectors.toLocaleString(), icon: <Users size={26} />, color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
-        { title: 'Partner Industries', value: dashboardStats.partnerIndustries, icon: <Building size={26} />, color: '#a855f7', bg: 'rgba(168,85,247,0.12)' },
-        { title: 'Total Members', value: dashboardStats.totalUsers.toLocaleString(), icon: <Users size={26} />, color: '#ec4899', bg: 'rgba(236,72,153,0.12)' },
-        { title: 'CO₂ Offset', value: dashboardStats.co2Saved, icon: <Wind size={26} />, color: '#22d3ee', bg: 'rgba(34,211,238,0.12)' },
+        { title: 'Total Waste Listed', value: dashboardStats.totalWasteListed, icon: <Leaf size={22} />, color: '#10b981', trend: '+14.2% MoM' },
+        { title: 'Waste Recycled', value: dashboardStats.totalWasteRecycled, icon: <Recycle size={22} />, color: '#06b6d4', trend: '+18.6% MoM' },
+        { title: 'Active Collectors', value: dashboardStats.activeCollectors.toLocaleString(), icon: <Users size={22} />, color: '#f59e0b', trend: 'Verified' },
+        { title: 'Partner Industries', value: dashboardStats.partnerIndustries, icon: <Building2 size={22} />, color: '#a855f7', trend: 'Direct Offtake' },
+        { title: 'Circular Members', value: dashboardStats.totalUsers.toLocaleString(), icon: <ShieldCheck size={22} />, color: '#ec4899', trend: 'Pan-India' },
+        { title: 'CO₂ Footprint Saved', value: dashboardStats.co2Saved, icon: <Wind size={22} />, color: '#34d399', trend: 'Eco-Certified' },
     ];
 
     const trendsData = {
@@ -41,19 +67,23 @@ const Dashboard = () => {
                 label: 'Waste Listed (Tons)',
                 data: dashboardStats.trends.listed,
                 borderColor: '#10b981',
-                backgroundColor: 'rgba(16,185,129,0.08)',
-                tension: 0.4,
+                backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                tension: 0.38,
                 fill: true,
                 pointBackgroundColor: '#10b981',
+                pointBorderColor: '#fff',
+                pointRadius: 4,
             },
             {
                 label: 'Waste Recycled (Tons)',
                 data: dashboardStats.trends.recycled,
-                borderColor: '#0ea5e9',
-                backgroundColor: 'rgba(14,165,233,0.08)',
-                tension: 0.4,
+                borderColor: '#06b6d4',
+                backgroundColor: 'rgba(6, 182, 212, 0.08)',
+                tension: 0.38,
                 fill: true,
-                pointBackgroundColor: '#0ea5e9',
+                pointBackgroundColor: '#06b6d4',
+                pointBorderColor: '#fff',
+                pointRadius: 4,
             }
         ]
     };
@@ -62,162 +92,276 @@ const Dashboard = () => {
         labels: dashboardStats.categoryShare.labels,
         datasets: [{
             data: dashboardStats.categoryShare.data,
-            backgroundColor: ['#3b82f6', '#f59e0b', '#6b7280', '#ef4444', '#10b981', '#a855f7'],
+            backgroundColor: ['#0ea5e9', '#f59e0b', '#94a3b8', '#ef4444', '#10b981', '#a855f7'],
             borderWidth: 2,
-            borderColor: '#1e293b',
-            hoverOffset: 8,
+            borderColor: '#0d221a',
+            hoverOffset: 6,
         }]
     };
 
     const revenueData = {
         labels: dashboardStats.trends.labels,
         datasets: [{
-            label: 'Platform Revenue (₹)',
+            label: 'Platform Circular Volume Value (₹)',
             data: dashboardStats.monthlyRevenue,
-            backgroundColor: 'rgba(168,85,247,0.8)',
-            borderRadius: 6,
+            backgroundColor: 'rgba(16, 185, 129, 0.75)',
+            hoverBackgroundColor: '#10b981',
+            borderRadius: 8,
         }]
     };
 
     return (
         <div className="dashboard-page animate-fade-in">
+            {/* Environmental Hero Header */}
+            <header className="dash-hero glass-pane">
+                <div className="dash-hero-main">
+                    <div className="dash-user-badge">
+                        <span className="user-role-pill badge-green">
+                            <Sparkles size={13} /> {user?.role ? user.role.toUpperCase() : 'MEMBER'} ACCOUNT
+                        </span>
+                        <span className="dash-status-dot">
+                            <span className="dot-pulse" /> Active Node
+                        </span>
+                    </div>
 
-            {/* Hero Banner */}
-            <div className="hero-banner glass-pane">
-                <div className="hero-text">
-                    <h1 className="hero-title">Welcome to <span className="text-gradient">ReValue</span></h1>
-                    <p className="hero-sub">India's Circular Economy Marketplace — Turning Waste into Value, one transaction at a time.</p>
-                    <div className="hero-actions">
+                    <h1 className="dash-title">
+                        Welcome back, <span className="text-gradient">{user?.name ? user.name.split(' ')[0] : 'Sustainability Leader'}</span>! 🌿
+                    </h1>
+
+                    <p className="dash-subtitle">
+                        Here is your real-time circular economy overview. Monitor incoming waste streams, tracking metrics, and environmental conservation progress.
+                    </p>
+
+                    <div className="dash-hero-actions">
                         {user?.role === 'individual' && (
                             <button className="btn btn-primary" onClick={() => navigate('/create-post')}>
-                                <PlusCircle size={18} /> Post Your Waste
+                                <PlusCircle size={18} /> Post Waste Listing
+                            </button>
+                        )}
+                        {user?.role === 'collector' && (
+                            <button className="btn btn-primary" onClick={() => navigate('/marketplace')}>
+                                <ShoppingBag size={18} /> Claim Waste Pickups
+                            </button>
+                        )}
+                        {user?.role === 'industry' && (
+                            <button className="btn btn-primary" onClick={() => navigate('/matches')}>
+                                <Zap size={18} /> View AI Matches
                             </button>
                         )}
                         <button className="btn btn-outline" onClick={() => navigate('/marketplace')}>
-                            Browse Marketplace <ArrowRight size={18} />
+                            Explore Marketplace <ArrowRight size={17} />
                         </button>
                     </div>
                 </div>
-                <div className="hero-visual">
-                    <div className="orbit-ring">
-                        <span className="orbit-icon" style={{ '--deg': '0deg' }}>♻️</span>
-                        <span className="orbit-icon" style={{ '--deg': '72deg' }}>🌿</span>
-                        <span className="orbit-icon" style={{ '--deg': '144deg' }}>🏭</span>
-                        <span className="orbit-icon" style={{ '--deg': '216deg' }}>📦</span>
-                        <span className="orbit-icon" style={{ '--deg': '288deg' }}>🔋</span>
-                    </div>
-                </div>
-            </div>
 
-            {/* Stats Grid */}
-            <div className="stats-grid dash-stats">
-                {stats.map((stat, idx) => (
-                    <div key={idx} className="stat-card glass-pane">
-                        <div className="stat-icon" style={{ backgroundColor: stat.bg, color: stat.color }}>
-                            {stat.icon}
+                <div className="dash-hero-stats-card">
+                    <div className="impact-counter-header">
+                        <Leaf size={20} color="var(--accent-mint)" />
+                        <span>Eco-Impact Summary</span>
+                    </div>
+                    <div className="counter-row">
+                        <div>
+                            <span className="counter-val text-gradient">12.5 T</span>
+                            <span className="counter-lbl">Landfill Diverted</span>
                         </div>
-                        <div className="stat-info">
-                            <h3 style={{ color: stat.color }}>{stat.value}</h3>
-                            <p>{stat.title}</p>
+                        <div className="counter-divider" />
+                        <div>
+                            <span className="counter-val text-gradient">32.8 T</span>
+                            <span className="counter-lbl">CO₂ Reduced</span>
                         </div>
                     </div>
-                ))}
-            </div>
+                    <div className="eco-verified-badge">
+                        <CheckCircle2 size={14} color="#10b981" /> Verified against ISO 14040 LCA Standards
+                    </div>
+                </div>
+            </header>
 
-            {/* Charts Row 1 */}
-            <div className="charts-grid">
-                <div className="chart-card glass-pane span-2">
-                    <h2><TrendingUp size={20} className="inline-icon" /> Waste Listing vs Recycling Trends</h2>
-                    <div className="chart-container">
-                        <Line data={trendsData} options={{ ...chartDefaults, responsive: true, maintainAspectRatio: false }} />
+            {/* Key Metrics Grid */}
+            <section className="metrics-section">
+                <div className="dash-section-header">
+                    <h2>Platform Activity & Sustainability Metrics</h2>
+                    <span className="header-badge">Live Real-Time Data</span>
+                </div>
+
+                <div className="stats-grid-dashboard">
+                    {stats.map((stat, idx) => (
+                        <div key={idx} className="metric-card glass-pane">
+                            <div className="metric-top">
+                                <div className="metric-icon" style={{ color: stat.color, background: `${stat.color}18`, border: `1px solid ${stat.color}33` }}>
+                                    {stat.icon}
+                                </div>
+                                <span className="metric-trend">{stat.trend}</span>
+                            </div>
+                            <div className="metric-bottom">
+                                <h3 className="metric-value" style={{ color: stat.color }}>{stat.value}</h3>
+                                <p className="metric-label">{stat.title}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* Analytics & Charts Grid */}
+            <section className="analytics-section">
+                <div className="charts-main-grid">
+                    {/* Line Chart */}
+                    <div className="chart-box glass-pane chart-line-span">
+                        <div className="chart-header">
+                            <div>
+                                <h3><TrendingUp size={18} className="chart-header-icon" /> Material Flow & Recycling Trajectory</h3>
+                                <p>Monthly comparison of listed waste versus closed-loop recycling offtake</p>
+                            </div>
+                        </div>
+                        <div className="chart-canvas-wrapper">
+                            <Line data={trendsData} options={chartDefaults} />
+                        </div>
+                    </div>
+
+                    {/* Donut Chart */}
+                    <div className="chart-box glass-pane chart-donut-span">
+                        <div className="chart-header">
+                            <div>
+                                <h3><Recycle size={18} className="chart-header-icon" /> Material Distribution</h3>
+                                <p>Breakdown by recyclable commodity</p>
+                            </div>
+                        </div>
+                        <div className="chart-canvas-wrapper donut-wrapper">
+                            <Doughnut
+                                data={categoryData}
+                                options={{
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    cutout: '70%',
+                                    plugins: {
+                                        legend: {
+                                            position: 'bottom',
+                                            labels: { color: '#e2e8f0', font: { family: 'Plus Jakarta Sans', size: 11 }, padding: 12 }
+                                        }
+                                    }
+                                }}
+                            />
+                        </div>
                     </div>
                 </div>
 
-                <div className="chart-card glass-pane">
-                    <h2><Recycle size={20} className="inline-icon" /> Material Share</h2>
-                    <div className="chart-container donut-container">
-                        <Doughnut
-                            data={categoryData}
-                            options={{
-                                responsive: true, maintainAspectRatio: false,
-                                cutout: '65%',
-                                plugins: { legend: { position: 'right', labels: { color: '#f1f5f9', padding: 16, font: { size: 12 } } } }
-                            }}
-                        />
+                {/* Revenue & Transaction Bar Chart */}
+                <div className="chart-box glass-pane full-width-chart">
+                    <div className="chart-header">
+                        <div>
+                            <h3><Activity size={18} className="chart-header-icon" /> Platform Economic Throughput (₹)</h3>
+                            <p>Monthly gross market exchange value generated through valorized materials</p>
+                        </div>
+                    </div>
+                    <div className="chart-canvas-wrapper bar-wrapper">
+                        <Bar data={revenueData} options={chartDefaults} />
                     </div>
                 </div>
-            </div>
+            </section>
 
-            {/* Charts Row 2 */}
-            <div className="charts-grid single">
-                <div className="chart-card glass-pane">
-                    <h2><Activity size={20} className="inline-icon" /> Platform Revenue Growth (₹)</h2>
-                    <div className="chart-container">
-                        <Bar data={revenueData} options={{ ...chartDefaults, responsive: true, maintainAspectRatio: false }} />
-                    </div>
+            {/* Role-Specific Quick Hub Actions */}
+            <section className="role-actions-section">
+                <div className="dash-section-header">
+                    <h2>Tailored Portals & Next Steps</h2>
+                    <p>Direct shortcuts matching your profile role</p>
                 </div>
-            </div>
 
-            {/* Role-based Quick Access */}
-            {user?.role === 'individual' && (
-                <div className="quick-actions-row">
-                    <div className="quick-card glass-pane" onClick={() => navigate('/create-post')}>
-                        <PlusCircle size={32} color="#10b981" />
-                        <h3>Post Waste</h3>
-                        <p>List your recyclables & get offers from collectors.</p>
+                {user?.role === 'individual' && (
+                    <div className="action-tiles-grid">
+                        <div className="action-tile glass-pane" onClick={() => navigate('/create-post')}>
+                            <div className="tile-icon-box green"><PlusCircle size={26} /></div>
+                            <h3>Post New Waste</h3>
+                            <p>List paper, plastics, e-waste or scrap with instant AI price estimation.</p>
+                            <span className="tile-link">Get Started <ArrowRight size={15} /></span>
+                        </div>
+                        <div className="action-tile glass-pane" onClick={() => navigate('/marketplace')}>
+                            <div className="tile-icon-box blue"><ShoppingBag size={26} /></div>
+                            <h3>Browse Marketplace</h3>
+                            <p>Explore current market pricing and see what materials are in high demand.</p>
+                            <span className="tile-link">Explore Listings <ArrowRight size={15} /></span>
+                        </div>
+                        <div className="action-tile glass-pane" onClick={() => navigate('/profile')}>
+                            <div className="tile-icon-box purple"><Package size={26} /></div>
+                            <h3>My Impact & History</h3>
+                            <p>Track your past sales, customer ratings, and your total CO₂ savings.</p>
+                            <span className="tile-link">View Portfolio <ArrowRight size={15} /></span>
+                        </div>
                     </div>
-                    <div className="quick-card glass-pane" onClick={() => navigate('/marketplace')}>
-                        <ShoppingCart size={32} color="#0ea5e9" />
-                        <h3>Browse Listings</h3>
-                        <p>See what's posted across your region.</p>
-                    </div>
-                    <div className="quick-card glass-pane" onClick={() => navigate('/profile')}>
-                        <Package size={32} color="#a855f7" />
-                        <h3>My Posts & History</h3>
-                        <p>Track your listed waste and past deals.</p>
-                    </div>
-                </div>
-            )}
+                )}
 
-            {user?.role === 'collector' && (
-                <div className="quick-actions-row">
-                    <div className="quick-card glass-pane" onClick={() => navigate('/marketplace')}>
-                        <ShoppingCart size={32} color="#10b981" />
-                        <h3>Find Waste</h3>
-                        <p>Browse individual posts to pick up.</p>
+                {user?.role === 'collector' && (
+                    <div className="action-tiles-grid">
+                        <div className="action-tile glass-pane" onClick={() => navigate('/marketplace')}>
+                            <div className="tile-icon-box green"><ShoppingBag size={26} /></div>
+                            <h3>Find Local Waste</h3>
+                            <p>Claim nearby individual listings for pickup within your operating radius.</p>
+                            <span className="tile-link">View Available Posts <ArrowRight size={15} /></span>
+                        </div>
+                        <div className="action-tile glass-pane" onClick={() => navigate('/hub')}>
+                            <div className="tile-icon-box amber"><Package size={26} /></div>
+                            <h3>My Collection Hub</h3>
+                            <p>Manage your aggregated inventory and prepare bulk shipments for mills.</p>
+                            <span className="tile-link">Open Hub Manager <ArrowRight size={15} /></span>
+                        </div>
+                        <div className="action-tile glass-pane" onClick={() => navigate('/organizations')}>
+                            <div className="tile-icon-box purple"><Building2 size={26} /></div>
+                            <h3>Supply to Industry</h3>
+                            <p>Connect with verified industrial processing plants seeking bulk feedstock.</p>
+                            <span className="tile-link">Browse Partners <ArrowRight size={15} /></span>
+                        </div>
                     </div>
-                    <div className="quick-card glass-pane" onClick={() => navigate('/hub')}>
-                        <Package size={32} color="#f59e0b" />
-                        <h3>My Hub Inventory</h3>
-                        <p>View collected waste ready to sell to industries.</p>
-                    </div>
-                    <div className="quick-card glass-pane" onClick={() => navigate('/organizations')}>
-                        <Building size={32} color="#a855f7" />
-                        <h3>Contact Industries</h3>
-                        <p>Offer bulk materials to recycling organizations.</p>
-                    </div>
-                </div>
-            )}
+                )}
 
-            {user?.role === 'industry' && (
-                <div className="quick-actions-row">
-                    <div className="quick-card glass-pane" onClick={() => navigate('/collectors')}>
-                        <Users size={32} color="#10b981" />
-                        <h3>Find Collectors</h3>
-                        <p>Browse collectors who supply your required materials.</p>
+                {user?.role === 'industry' && (
+                    <div className="action-tiles-grid">
+                        <div className="action-tile glass-pane" onClick={() => navigate('/matches')}>
+                            <div className="tile-icon-box green"><Zap size={26} /></div>
+                            <h3>AI Industry Matches</h3>
+                            <p>View collectors holding the exact scrap grades and quantities your facility requires.</p>
+                            <span className="tile-link">Inspect Smart Matches <ArrowRight size={15} /></span>
+                        </div>
+                        <div className="action-tile glass-pane" onClick={() => navigate('/collectors')}>
+                            <div className="tile-icon-box blue"><Users size={26} /></div>
+                            <h3>Collector Network</h3>
+                            <p>Browse regional aggregator hubs and contract reliable steady supply agreements.</p>
+                            <span className="tile-link">Find Suppliers <ArrowRight size={15} /></span>
+                        </div>
+                        <div className="action-tile glass-pane" onClick={() => navigate('/profile')}>
+                            <div className="tile-icon-box purple"><Building2 size={26} /></div>
+                            <h3>Company Specs</h3>
+                            <p>Update your required material types, acceptable purity levels, and buying prices.</p>
+                            <span className="tile-link">Edit Requirements <ArrowRight size={15} /></span>
+                        </div>
                     </div>
-                    <div className="quick-card glass-pane" onClick={() => navigate('/tracking')}>
-                        <Activity size={32} color="#0ea5e9" />
-                        <h3>Track Deliveries</h3>
-                        <p>Monitor your ongoing material purchases.</p>
-                    </div>
-                    <div className="quick-card glass-pane" onClick={() => navigate('/profile')}>
-                        <Building size={32} color="#a855f7" />
-                        <h3>Company Profile</h3>
-                        <p>Manage your industry profile and requirements.</p>
-                    </div>
+                )}
+            </section>
+
+            {/* Live Marketplace Feed Preview */}
+            <section className="recent-feed-section">
+                <div className="dash-section-header">
+                    <h2>Live Verified Listings</h2>
+                    <span className="header-link" onClick={() => navigate('/marketplace')}>View all listings →</span>
                 </div>
-            )}
+
+                <div className="recent-cards-row">
+                    {demoPosts.slice(0, 3).map(post => (
+                        <div key={post._id} className="mini-post-card glass-pane" onClick={() => navigate('/marketplace')}>
+                            <div className="mini-card-img" style={{ backgroundImage: `url(${post.image})` }}>
+                                <span className={`badge badge-${post.category}`}>{post.category}</span>
+                            </div>
+                            <div className="mini-card-body">
+                                <h4>{post.title}</h4>
+                                <div className="mini-card-meta">
+                                    <span className="mini-weight"><Package size={13} /> {post.weight} kg</span>
+                                    <span className="mini-price">{post.price}</span>
+                                </div>
+                                <div className="mini-card-loc">
+                                    <MapPin size={12} /> {post.location}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
         </div>
     );
 };
