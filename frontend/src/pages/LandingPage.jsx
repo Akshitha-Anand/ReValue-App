@@ -20,8 +20,8 @@ const LandingPage = () => {
 
     return (
         <div className="landing-page animate-fade-in">
-            {/* Top Navigation */}
-            <nav className="landing-nav glass-pane">
+            {/* Top Navigation - Full Width Edge-to-Edge */}
+            <nav className="landing-nav">
                 <div className="nav-brand" onClick={() => navigate('/')}>
                     <div className="brand-icon-box">
                         <Recycle size={24} className="brand-spin-icon" />

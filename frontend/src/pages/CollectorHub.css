@@ -1,12 +1,15 @@
+/* CollectorHub.css */
 .hub-page {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 }
 
 .hub-stats-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 1.25rem;
-    margin-bottom: 2rem;
 }
 
 .hub-stat {
@@ -14,49 +17,65 @@
     align-items: center;
     gap: 1.25rem;
     padding: 1.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    transition: transform 0.3s;
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    transition: all 0.25s ease;
 }
 
 .hub-stat:hover {
     transform: translateY(-3px);
+    border-color: rgba(16, 185, 129, 0.35);
+}
+
+.hub-stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
 .hub-stat h3 {
-    font-size: 1.6rem;
-    margin-bottom: 0.1rem;
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 0.2rem;
 }
 
 .hub-stat p {
     color: var(--text-secondary);
     font-size: 0.85rem;
+    font-weight: 600;
 }
 
 .hub-charts-row {
     display: grid;
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: 1.2fr 2fr;
     gap: 1.5rem;
-    margin-bottom: 2rem;
 }
 
 .chart-card {
-    padding: 1.75rem;
+    padding: 1.85rem;
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
 }
 
 .chart-card h2 {
-    font-size: 1.1rem;
-    color: var(--text-secondary);
-    font-weight: 500;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    font-weight: 700;
     margin-bottom: 1.25rem;
-}
-
-.chart-card.span-2 {
-    grid-column: span 1;
 }
 
 .hub-table-card {
     padding: 2rem;
-    margin-bottom: 2rem;
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
 }
 
 .hub-table-header {
@@ -66,102 +85,51 @@
     margin-bottom: 1.5rem;
 }
 
-.hub-table-header h2 {
-    margin: 0;
-    font-size: 1.25rem;
-}
-
-.table-wrapper {
-    overflow-x: auto;
-}
-
 .hub-table {
     width: 100%;
     border-collapse: collapse;
 }
 
 .hub-table th {
-    color: var(--text-secondary);
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 0.75rem 1rem;
     text-align: left;
+    padding: 0.85rem 1rem;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
     border-bottom: 1px solid var(--border-color);
 }
 
 .hub-table td {
     padding: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    font-size: 0.95rem;
-}
-
-.hub-table tr:hover td {
-    background: rgba(255, 255, 255, 0.03);
-}
-
-.positive {
-    color: var(--accent-primary);
-    font-weight: 600;
-}
-
-.margin-badge {
-    padding: 0.2rem 0.6rem;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    background: rgba(16, 185, 129, 0.15);
-}
-
-.margin-badge.positive {
-    color: var(--accent-primary);
-}
-
-.buyer-chip {
-    background: rgba(14, 165, 233, 0.15);
-    color: #38bdf8;
-    padding: 0.2rem 0.6rem;
-    border-radius: 12px;
-    font-size: 0.8rem;
-}
-
-.no-buyer {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.92rem;
     color: var(--text-secondary);
 }
 
-.icon-btn-sm {
-    padding: 0.4rem 0.75rem;
-    font-size: 0.8rem;
-    gap: 0.35rem;
+.hub-table tr:hover td {
+    background: rgba(16, 185, 129, 0.04);
 }
 
-.status-chip {
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: 600;
+.inv-progress-bar {
+    width: 120px;
+    height: 7px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin-top: 0.3rem;
 }
 
-.status-chip.received {
-    background: rgba(16, 185, 129, 0.15);
-    color: var(--accent-primary);
+.inv-progress-fill {
+    height: 100%;
+    background: var(--accent-gradient);
+    border-radius: var(--radius-full);
 }
 
-.status-chip.in-transit {
-    background: rgba(245, 158, 11, 0.15);
-    color: #fbbf24;
-}
-
-.status-chip.pending {
-    background: rgba(14, 165, 233, 0.15);
-    color: #38bdf8;
-}
-
-@media (max-width: 1024px) {
+@media (max-width: 1100px) {
     .hub-stats-row {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
-
     .hub-charts-row {
         grid-template-columns: 1fr;
     }

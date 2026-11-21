@@ -32,12 +32,23 @@ const RoleProtectedRoute = ({ children, allowedRoles }) => {
 
 const AppLayout = ({ children }) => {
   const { user } = useAuth();
+
+  // If not logged in, render in full-width public layout (no sidebar, no margin restrictions)
+  if (!user) {
+    return (
+      <div className="public-app-container">
+        <main className="public-main">{children}</main>
+      </div>
+    );
+  }
+
+  // When logged in, render in authenticated dashboard layout with sidebar and top navbar
   return (
     <div className="app-container">
-      {user && <Sidebar />}
-      <div className="main-content" style={!user ? { marginLeft: 0, padding: 0 } : {}}>
-        {user && <Navbar />}
-        <main>{children}</main>
+      <Sidebar />
+      <div className="main-content">
+        <Navbar />
+        <main className="dashboard-content">{children}</main>
       </div>
     </div>
   );
