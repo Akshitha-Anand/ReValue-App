@@ -168,7 +168,7 @@ const Profile = () => {
                                     {(viewedUser.materialsAccepted || ['plastic', 'paper', 'metal']).map(m => (
                                         <div key={m} className="m-stat">
                                             <span className={`badge badge-${m}`}>{m}</span>
-                                            <span className="m-val">{Math.floor(Math.random() * 500) + 100} kg</span>
+                                            <span className="m-val">280 kg</span>
                                         </div>
                                     ))}
                                 </div>
@@ -189,9 +189,9 @@ const Profile = () => {
 
                 {activeTab === 'posts' && (
                     <div className="posts-tab">
-                        <h2>{user?.role === 'collector' ? 'Collected Items' : 'My Listings'}</h2>
+                        <h2>{currentUser?.role === 'collector' ? 'Collected Items' : 'My Listings'}</h2>
                         {userPosts.length === 0 ? (
-                            <div className="empty-state"><p>{user?.role === 'collector' ? "You haven't collected any items yet." : "You haven't posted any items yet."}</p></div>
+                            <div className="empty-state"><p>{currentUser?.role === 'collector' ? "You haven't collected any items yet." : "You haven't posted any items yet."}</p></div>
                         ) : userPosts.map(p => (
                             <div key={p._id} className="post-list-item glass-pane">
                                 <div className="pli-img" style={{ backgroundImage: `url(${p.image})` }}></div>
