@@ -9,14 +9,23 @@ import './Marketplace.css';
 
 const categoryColors = { plastic: '#3b82f6', paper: '#f59e0b', metal: '#6b7280', ewaste: '#ef4444', glass: '#10b981' };
 
+const getImageUrl = (img) => {
+    if (!img) return 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&q=80&w=400';
+    if (img.startsWith('http')) return img;
+    return `${API_BASE_URL}${img}`;
+};
+
 const PostModal = ({ post, onClose, onChat }) => {
     if (!post) return null;
+    const sellerName = post.createdBy?.name || 'Verified Member';
+    const sellerId = post.createdBy?._id || post.createdBy;
+
     return (
         <div className="modal-backdrop" onClick={onClose}>
             <div className="post-modal glass-pane animate-fade-in" onClick={e => e.stopPropagation()}>
                 <button className="modal-close" onClick={onClose}><X size={22} /></button>
 
-                <div className="modal-image" style={{ backgroundImage: `url(${post.image})` }}>
+                <div className="modal-image" style={{ backgroundImage: `url(${getImageUrl(post.image)})` }}>
                     <span className={`badge badge-${post.category} category-badge`}>{post.category}</span>
                     {post.status === 'requested' && <span className="badge badge-warning status-badge">Requested</span>}
                 </div>
@@ -28,7 +37,7 @@ const PostModal = ({ post, onClose, onChat }) => {
                     <div className="modal-details-grid">
                         <div className="md-item">
                             <span className="md-label">Weight</span>
-                            <span className="md-val">{post.weight} kg</span>
+                            <span className="md-val">{post.weight} {post.unit || 'kg'}</span>
                         </div>
                         <div className="md-item">
                             <span className="md-label">Condition</span>
@@ -36,7 +45,7 @@ const PostModal = ({ post, onClose, onChat }) => {
                         </div>
                         <div className="md-item">
                             <span className="md-label">Price Range</span>
-                            <span className="md-val">₹{post.priceMin} - ₹{post.priceMax}/kg</span>
+                            <span className="md-val">₹{post.priceMin} - ₹{post.priceMax || post.priceMin}/{post.unit || 'kg'}</span>
                         </div>
                         <div className="md-item">
                             <span className="md-label">Location</span>
@@ -44,29 +53,29 @@ const PostModal = ({ post, onClose, onChat }) => {
                         </div>
                         <div className="md-item">
                             <span className="md-label">Pincode</span>
-                            <span className="md-val">{post.pincode}</span>
+                            <span className="md-val">{post.pincode || 'N/A'}</span>
                         </div>
                         <div className="md-item">
                             <span className="md-label">Posted On</span>
-                            <span className="md-val"><Calendar size={14} /> {post.postedAt}</span>
+                            <span className="md-val"><Calendar size={14} /> {post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Recent'}</span>
                         </div>
                     </div>
 
                     <div className="modal-seller">
-                        <div className="seller-avatar">{post.createdBy.name.charAt(0)}</div>
+                        <div className="seller-avatar">{sellerName.charAt(0)}</div>
                         <div>
-                            <p className="seller-n">{post.createdBy.name}</p>
+                            <p className="seller-n">{sellerName}</p>
                             <div className="stars-row">
                                 {[1, 2, 3, 4, 5].map(s => (
-                                    <Star key={s} size={14} fill={s <= Math.round(post.createdBy.rating) ? '#f59e0b' : 'none'} color="#f59e0b" />
+                                    <Star key={s} size={14} fill={s <= Math.round(post.createdBy?.rating || 5) ? '#f59e0b' : 'none'} color="#f59e0b" />
                                 ))}
-                                <span className="rating-val">{post.createdBy.rating}</span>
+                                <span className="rating-val">{post.createdBy?.rating || 5.0}</span>
                             </div>
                         </div>
                     </div>
 
-                    <button className="btn btn-primary chat-modal-btn" onClick={() => onChat(post.createdBy._id, post.createdBy.name)}>
-                        <MessageSquare size={18} /> Negotiate with {post.createdBy.name.split(' ')[0]}
+                    <button className="btn btn-primary chat-modal-btn" onClick={() => onChat(sellerId, sellerName)}>
+                        <MessageSquare size={18} /> Negotiate with {sellerName.split(' ')[0]}
                     </button>
                 </div>
             </div>
@@ -208,7 +217,7 @@ const Marketplace = () => {
                     <div className="posts-grid">
                         {filteredPosts.map(post => (
                             <div key={post._id} className="post-card glass-pane">
-                                <div className="post-image" style={{ backgroundImage: `url(${post.image})` }}>
+                                <div className="post-image" style={{ backgroundImage: `url(${getImageUrl(post.image)})` }}>
                                     <span className={`badge badge-${post.category} category-badge`}>{post.category}</span>
                                     {post.status !== 'available' && (
                                         <span className="status-label-card">{post.status}</span>

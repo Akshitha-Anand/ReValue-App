@@ -4,6 +4,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const http = require("http");
+const path = require("path");
 
 const authRoutes = require("./routes/authRoutes");
 const postRoutes = require("./routes/postRoutes");
@@ -15,7 +16,7 @@ const matchingRoutes = require("./routes/matchingRoutes");
 
 const Chat = require("./models/Chat");
 const User = require("./models/User");
-const { initSocket, onlineUsers } = require("./utils/socketManager");
+const { initSocket, onlineUsers, sendNotificationToUser } = require("./utils/socketManager");
 
 const app = express();
 
@@ -25,7 +26,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.use("/uploads", express.static("uploads"));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
@@ -61,33 +62,25 @@ const io = require("socket.io")(server, {
 // Initialize socket manager with shared io instance
 initSocket(io);
 
-// Keep existing chat message listener
+// Real-time chat message listener
 io.on("connection", socket => {
     socket.on("sendMessage", async data => {
         try {
             const { senderId, receiverId, message } = data;
-
-            const sender = await User.findById(senderId);
-            const receiver = await User.findById(receiverId);
-
-            if (!sender || !receiver) return;
-
-            // role restriction
-            if (sender.role === "individual" && receiver.role !== "collector") return;
-            if (sender.role === "industry" && receiver.role !== "collector") return;
+            if (!senderId || !receiverId || !message) return;
 
             const chat = new Chat({
                 sender: senderId,
                 receiver: receiverId,
-                message
+                message: message.trim()
             });
 
             await chat.save();
 
-            const receiverSocket = onlineUsers[receiverId];
-            if (receiverSocket) {
-                io.to(receiverSocket).emit("receiveMessage", chat);
-            }
+            // Real-time dispatch via socket manager to online users
+            sendNotificationToUser(receiverId, "receiveMessage", chat);
+            sendNotificationToUser(senderId, "messageSent", chat);
+            socket.emit("messageSent", chat);
         } catch (err) {
             console.error("Socket chat error:", err);
         }

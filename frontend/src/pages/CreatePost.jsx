@@ -47,6 +47,8 @@ const CreatePost = () => {
     const [imagePreview, setImagePreview] = useState(null);
     const [aiState, setAiState] = useState({ loading: false, result: null });
     const [submitted, setSubmitted] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState(null);
     const [coords, setCoords] = useState({ latitude: null, longitude: null });
     const [geoStatus, setGeoStatus] = useState('idle'); // idle | loading | success | error
 
@@ -137,15 +139,33 @@ const CreatePost = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(null);
+
+        if (!token) {
+            setError("You must be logged in to publish a waste listing. Please sign in.");
+            return;
+        }
+
+        if (!formData.title.trim() || !formData.category || !formData.weight || !formData.priceMin || !formData.location.trim()) {
+            setError("Please fill out all required fields marked with *.");
+            return;
+        }
+
+        setIsSubmitting(true);
 
         try {
             const payload = new FormData();
-            Object.keys(formData).forEach(key => payload.append(key, formData[key]));
+            Object.keys(formData).forEach(key => {
+                if (formData[key] !== null && formData[key] !== undefined && formData[key] !== '') {
+                    payload.append(key, formData[key]);
+                }
+            });
+
             if (imageFile) {
                 payload.append('image', imageFile);
             }
             // Append GPS coordinates if captured
-            if (coords.latitude !== null) {
+            if (coords.latitude !== null && coords.longitude !== null) {
                 payload.append('latitude', coords.latitude);
                 payload.append('longitude', coords.longitude);
             }
@@ -156,21 +176,25 @@ const CreatePost = () => {
                 payload.append('isConfirmedByUser', 'true');
             }
 
-            await axios.post(`${API_BASE_URL}/api/posts`, payload, {
-
+            const res = await axios.post(`${API_BASE_URL}/api/posts`, payload, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`
                 }
             });
 
-            setSubmitted(true);
-            setTimeout(() => navigate('/marketplace'), 2000);
+            if (res.status === 201 || res.data?.post) {
+                setSubmitted(true);
+                setTimeout(() => navigate('/marketplace'), 2000);
+            } else {
+                throw new Error(res.data?.message || "Failed to publish listing.");
+            }
         } catch (err) {
             console.error("Error creating post:", err);
-            // Fallback for demo just in case backend throws an error
-            setSubmitted(true);
-            setTimeout(() => navigate('/marketplace'), 2000);
+            const errMsg = err.response?.data?.message || err.response?.data?.error || err.message || "Failed to create post. Please try again.";
+            setError(errMsg);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -197,6 +221,23 @@ const CreatePost = () => {
             </div>
 
             <div className="post-form-wrapper glass-pane">
+                {error && (
+                    <div className="alert-error-banner" style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.75rem',
+                        padding: '0.85rem 1.25rem',
+                        marginBottom: '1.5rem',
+                        background: 'rgba(239, 68, 68, 0.12)',
+                        border: '1px solid rgba(239, 68, 68, 0.35)',
+                        borderRadius: 'var(--radius-md)',
+                        color: '#fca5a5',
+                        fontSize: '0.9rem'
+                    }}>
+                        <AlertTriangle size={18} color="#ef4444" style={{ flexShrink: 0 }} />
+                        <span>{error}</span>
+                    </div>
+                )}
                 <form onSubmit={handleSubmit} className="post-form">
 
                     {/* Left: Image + AI */}
@@ -374,8 +415,12 @@ const CreatePost = () => {
                                 rows="3" />
                         </div>
 
-                        <button type="submit" className="btn btn-primary submit-btn">
-                            <UploadCloud size={20} /> Publish Listing
+                        <button type="submit" disabled={isSubmitting} className="btn btn-primary submit-btn">
+                            {isSubmitting ? (
+                                <><Loader size={20} className="spin" /> Publishing Listing...</>
+                            ) : (
+                                <><UploadCloud size={20} /> Publish Listing</>
+                            )}
                         </button>
                     </div>
                 </form>

@@ -13,7 +13,14 @@ exports.createPost = async (req, res) => {
             aiPredictedCategory, aiConfidence, isConfirmedByUser
         } = req.body;
 
-        const image = req.file ? `http://localhost:5000/uploads/${req.file.filename}` : req.body.image || null;
+        const defaultCategoryThumbnails = {
+            plastic: 'https://images.unsplash.com/photo-1611284446314-60a5840ce3d2?auto=format&fit=crop&q=80&w=400',
+            paper: 'https://images.unsplash.com/photo-1595278148419-3549e3e3bdf5?auto=format&fit=crop&q=80&w=400',
+            metal: 'https://images.unsplash.com/photo-1572205336214-41d89bf44a7f?auto=format&fit=crop&q=80&w=400',
+            ewaste: 'https://images.unsplash.com/photo-1550083395-65abdb20b606?auto=format&fit=crop&q=80&w=400',
+            glass: 'https://images.unsplash.com/photo-1517524285303-d6fc683dddf8?auto=format&fit=crop&q=80&w=400'
+        };
+        const image = req.file ? `/uploads/${req.file.filename}` : req.body.image || defaultCategoryThumbnails[category] || 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&q=80&w=400';
 
         // Parse coordinates if provided
         const numLat = latitude !== undefined && latitude !== "" ? Number(latitude) : null;

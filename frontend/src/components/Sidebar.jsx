@@ -24,10 +24,12 @@ const Sidebar = () => {
             { to: '/create-post', name: 'Post Waste', icon: <PlusCircle size={20} /> },
         ],
         collector: [
+            { to: '/create-post', name: 'Post Waste', icon: <PlusCircle size={20} /> },
             { to: '/hub', name: 'My Hub', icon: <Warehouse size={20} /> },
             { to: '/organizations', name: 'Industries', icon: <Building size={20} /> },
         ],
         industry: [
+            { to: '/create-post', name: 'Post Material Demand', icon: <PlusCircle size={20} /> },
             { to: '/matches', name: 'AI Matches', icon: <Zap size={20} /> },
             { to: '/collectors', name: 'Collectors', icon: <Package size={20} /> },
         ],
@@ -35,7 +37,7 @@ const Sidebar = () => {
 
     const links = [
         commonLinks[0],                                                // Dashboard
-        ...(user?.role !== 'industry' ? [commonLinks[1]] : []),        // Marketplace
+        commonLinks[1],                                                // Marketplace (available to all)
         ...(roleLinks[user?.role] || []),                              // Role-specific
         commonLinks[2],                                                // Messages
         commonLinks[3],                                                // Notifications
