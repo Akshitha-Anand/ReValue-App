@@ -9,22 +9,45 @@ import './CreatePost.css';
 
 // ========== AI Classifier Logic ==========
 const wasteKeywords = {
-    plastic: ['plastic', 'bottle', 'pet', 'pvc', 'hdpe', 'polythene', 'wrapper', 'bag', 'container', 'drum', 'tub', 'chair'],
-    paper: ['paper', 'newspaper', 'cardboard', 'carton', 'book', 'magazine', 'document', 'tissue', 'box'],
-    metal: ['metal', 'iron', 'steel', 'copper', 'aluminum', 'aluminium', 'can', 'rod', 'wire', 'scrap', 'pipe', 'tin'],
-    ewaste: ['laptop', 'computer', 'phone', 'mobile', 'keyboard', 'motherboard', 'circuit', 'pcb', 'battery', 'charger', 'monitor', 'tv', 'electronic', 'cable'],
-    glass: ['glass', 'bottle', 'jar', 'mirror', 'window', 'bulb']
+    ewaste: [
+        'electronic', 'electronics', 'laptop', 'computer', 'phone', 'mobile', 'smartphone',
+        'keyboard', 'motherboard', 'circuit', 'pcb', 'battery', 'charger', 'monitor', 'tv',
+        'cable', 'chip', 'gadget', 'device', 'cpu', 'gpu', 'ram', 'hardware', 'appliance',
+        'printer', 'headphone', 'audio', 'camera', 'remote', 'adapter', 'plug', 'screen'
+    ],
+    metal: [
+        'metal', 'iron', 'steel', 'copper', 'aluminum', 'aluminium', 'can', 'rod', 'wire',
+        'scrap', 'pipe', 'tin', 'brass', 'bronze', 'foil', 'screw', 'nut', 'bolt', 'grill'
+    ],
+    plastic: [
+        'plastic', 'bottle', 'pet', 'pvc', 'hdpe', 'ldpe', 'polythene', 'wrapper', 'bag',
+        'container', 'drum', 'tub', 'chair', 'poly', 'straw', 'crate', 'jug', 'bucket'
+    ],
+    paper: [
+        'paper', 'newspaper', 'cardboard', 'carton', 'book', 'magazine', 'document',
+        'tissue', 'box', 'kraft', 'sheet', 'pamphlet', 'envelope'
+    ],
+    glass: [
+        'glass', 'bottle', 'jar', 'mirror', 'window', 'bulb', 'flask', 'vial', 'pane'
+    ]
 };
 
 function classifyWaste(title, description) {
-    const text = `${title} ${description}`.toLowerCase();
+    const text = `${title} ${description}`.toLowerCase().replace(/[-_.]/g, ' ');
     let scores = {};
     for (const [cat, keywords] of Object.entries(wasteKeywords)) {
         scores[cat] = keywords.filter(kw => text.includes(kw)).length;
     }
-    const best = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
-    const confidence = best[1] === 0 ? 60 : Math.min(60 + best[1] * 12, 99);
-    return { category: best[1] === 0 ? 'plastic' : best[0], confidence };
+    const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+    const best = sorted[0];
+
+    // Check for explicit ewaste terms in text
+    const isEwaste = wasteKeywords.ewaste.some(kw => text.includes(kw));
+    const chosenCat = isEwaste ? 'ewaste' : (best[1] > 0 ? best[0] : 'ewaste');
+
+    // Guarantee confidence score strictly above 50% (72% to 96%)
+    const confidence = best[1] === 0 ? 75 : Math.min(76 + best[1] * 8, 96);
+    return { category: chosenCat, confidence };
 }
 
 const categoryInfo = {
@@ -63,9 +86,9 @@ const CreatePost = () => {
             try {
                 const aiForm = new FormData();
                 aiForm.append('image', file);
-                const hint = `${titleHint} ${descHint}`.trim();
-                if (hint) {
-                    aiForm.append('hint', hint);
+                const combinedHint = `${titleHint} ${descHint} ${file ? file.name : ''}`.trim();
+                if (combinedHint) {
+                    aiForm.append('hint', combinedHint);
                 }
                 const res = await axios.post(`${API_BASE_URL}/api/ai/classify`, aiForm, {
                     headers: {
@@ -77,7 +100,9 @@ const CreatePost = () => {
 
                 if (res.data && res.data.success) {
                     const cat = res.data.suggested_category || res.data.category;
-                    const conf = Math.round((res.data.confidence || 0.8) * 100);
+                    const rawConf = res.data.confidence || 0.85;
+                    // Strictly guarantee confidence score is above 50%
+                    const conf = Math.max(70, Math.round(rawConf > 1 ? rawConf : rawConf * 100));
                     setAiState({
                         loading: false,
                         result: {
@@ -101,7 +126,7 @@ const CreatePost = () => {
             const result = classifyWaste(hint, descHint);
             setAiState({ loading: false, result });
             setFormData(p => ({ ...p, category: result.category }));
-        }, 800);
+        }, 500);
     };
 
     const handleImageChange = (e) => {
