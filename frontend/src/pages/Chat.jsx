@@ -390,12 +390,16 @@ const Chat = () => {
                                         {activeContact?.avatar || activeContact?.name?.charAt(0) || 'U'}
                                     </div>
                                     <div>
+                                        <div className="chat-role-pill-row">
+                                            <span className={`role-pill-badge role-badge-${activeContact?.role || 'individual'}`}>
+                                                {activeContact?.role === 'collector' && <><Truck size={13} /> VERIFIED SCRAP COLLECTOR</>}
+                                                {activeContact?.role === 'industry' && <><Building size={13} /> RECYCLING INDUSTRY OFFTAKER</>}
+                                                {(!activeContact?.role || activeContact?.role === 'individual') && <><UserIcon size={13} /> INDIVIDUAL / HOUSEHOLD SELLER</>}
+                                            </span>
+                                        </div>
                                         <h2 className="chat-active-name">{activeContact?.name || 'Partner'}</h2>
                                         <div className="cw-status-row">
-                                            <span className={`badge badge-${activeContact?.role || 'individual'}`}>
-                                                {getRoleIcon(activeContact?.role)} {activeContact?.role || 'user'}
-                                            </span>
-                                            <span className="dot-online-text">● Ready to trade</span>
+                                            <span className="dot-online-text">● Active Node in Circular Economy</span>
                                         </div>
                                     </div>
                                 </div>
@@ -405,6 +409,25 @@ const Chat = () => {
                                         <UserPlus size={14} /> Directory
                                     </button>
                                 </div>
+                            </div>
+
+                            <div className="chat-role-indicator-banner">
+                                {activeContact?.role === 'collector' ? (
+                                    <div className="role-tag-highlight role-collector">
+                                        <Truck size={16} />
+                                        <span>ROLE: <strong>VERIFIED SCRAP COLLECTOR</strong> — Quotes scrap rates, aggregates materials & conducts home/hub pickups.</span>
+                                    </div>
+                                ) : activeContact?.role === 'industry' ? (
+                                    <div className="role-tag-highlight role-industry">
+                                        <Building size={16} />
+                                        <span>ROLE: <strong>RECYCLING INDUSTRY</strong> — Procures sorted scrap materials in bulk for manufacturing & refinement.</span>
+                                    </div>
+                                ) : (
+                                    <div className="role-tag-highlight role-individual">
+                                        <UserIcon size={16} />
+                                        <span>ROLE: <strong>HOUSEHOLD INDIVIDUAL</strong> — Listing household recyclable materials for local collection.</span>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="chat-messages">

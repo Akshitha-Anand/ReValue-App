@@ -134,23 +134,35 @@ const Dashboard = () => {
 
                     <div className="dash-hero-actions">
                         {user?.role === 'individual' && (
-                            <button className="btn btn-primary" onClick={() => navigate('/create-post')}>
-                                <PlusCircle size={18} /> Post Waste Listing
-                            </button>
+                            <>
+                                <button className="btn btn-primary" onClick={() => navigate('/create-post')}>
+                                    <PlusCircle size={18} /> Post Waste Listing
+                                </button>
+                                <button className="btn btn-outline" onClick={() => navigate('/marketplace')}>
+                                    Explore Marketplace <ArrowRight size={17} />
+                                </button>
+                            </>
                         )}
                         {user?.role === 'collector' && (
-                            <button className="btn btn-primary" onClick={() => navigate('/marketplace')}>
-                                <ShoppingBag size={18} /> Claim Waste Pickups
-                            </button>
+                            <>
+                                <button className="btn btn-primary" onClick={() => navigate('/marketplace')}>
+                                    <ShoppingBag size={18} /> Review & Quote Scrap
+                                </button>
+                                <button className="btn btn-outline" onClick={() => navigate('/organizations')}>
+                                    <Building2 size={17} /> Industry Demand <ArrowRight size={15} />
+                                </button>
+                            </>
                         )}
                         {user?.role === 'industry' && (
-                            <button className="btn btn-primary" onClick={() => navigate('/matches')}>
-                                <Zap size={18} /> View AI Matches
-                            </button>
+                            <>
+                                <button className="btn btn-primary" onClick={() => navigate('/marketplace')}>
+                                    <Package size={18} /> Procure Collector Stocks
+                                </button>
+                                <button className="btn btn-outline" onClick={() => navigate('/matches')}>
+                                    <Zap size={17} /> View AI Matches <ArrowRight size={15} />
+                                </button>
+                            </>
                         )}
-                        <button className="btn btn-outline" onClick={() => navigate('/marketplace')}>
-                            Explore Marketplace <ArrowRight size={17} />
-                        </button>
                     </div>
                 </div>
 

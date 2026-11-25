@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { demoCollectors, demoOrganizations } from '../data/demoData';
 import { MessageSquare, MapPin, Star, CheckCircle, Search, Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import API_BASE_URL from '../api';
 import './Organizations.css';
 
 // ===== MOCK AI COMPANY VERIFIER =====
@@ -24,17 +26,58 @@ const verifyCompany = (name, gstin) => {
 
 // ===== Entity Browse Page (Collectors or Industries) =====
 const EntityBrowse = ({ onContact }) => {
-    const { user } = useAuth();
+    const { user, token } = useAuth();
     const navigate = useNavigate();
     const [search, setSearch] = useState('');
     const [materialFilter, setMaterialFilter] = useState('all');
+    const [entities, setEntities] = useState([]);
 
     const showIndustries = user?.role === 'collector';
-    const data = showIndustries ? demoOrganizations : demoCollectors;
 
-    const filtered = data.filter(item => {
+    useEffect(() => {
+        let isMounted = true;
+        const fetchEntities = async () => {
+            const defaultList = showIndustries ? demoOrganizations : demoCollectors;
+            try {
+                const targetRole = showIndustries ? 'industry' : 'collector';
+                const res = await axios.get(`${API_BASE_URL}/api/chat/contacts/available?role=${targetRole}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                if (isMounted) {
+                    if (Array.isArray(res.data) && res.data.length > 0) {
+                        // Merge registered users with demo baseline
+                        const registered = res.data.map(r => ({
+                            _id: r._id,
+                            name: r.name,
+                            verified: true,
+                            industryType: r.industryType || 'Recycling Plant',
+                            location: r.businessAddress || r.hubLocation || 'Bengaluru',
+                            materialsNeeded: r.materialsRequired && r.materialsRequired.length > 0 ? r.materialsRequired : ['plastic', 'metal'],
+                            monthlyDemand: r.monthlyDemand || '45 Tons/month',
+                            minQuantityRequired: r.minQuantityRequired || 100,
+                            qualityPreference: r.qualityPreference || 'Sorted',
+                            contactPerson: r.contactPerson || 'Procurement Office',
+                            phone: r.phone
+                        }));
+                        setEntities([...registered, ...defaultList.filter(d => !registered.some(r => r.name.toLowerCase() === d.name.toLowerCase()))]);
+                    } else {
+                        setEntities(defaultList);
+                    }
+                }
+            } catch (err) {
+                if (isMounted) setEntities(defaultList);
+            }
+        };
+
+        fetchEntities();
+        return () => { isMounted = false; };
+    }, [showIndustries, token]);
+
+    const filtered = entities.filter(item => {
         const matchSearch = item.name.toLowerCase().includes(search.toLowerCase()) ||
-            (item.hubLocation || item.location || '').toLowerCase().includes(search.toLowerCase());
+            (item.hubLocation || item.location || '').toLowerCase().includes(search.toLowerCase()) ||
+            (item.industryType || '').toLowerCase().includes(search.toLowerCase());
         const matchMaterial = materialFilter === 'all' ||
             (item.materialsAccepted || item.materialsNeeded || []).includes(materialFilter);
         return matchSearch && matchMaterial;
@@ -46,15 +89,15 @@ const EntityBrowse = ({ onContact }) => {
                 <div className="org-search glass-pane">
                     <Search size={18} />
                     <input value={search} onChange={e => setSearch(e.target.value)}
-                        placeholder={showIndustries ? "Search industries..." : "Search collectors..."} />
+                        placeholder={showIndustries ? "Search industries by company name, factory location, or material..." : "Search collectors..."} />
                 </div>
                 <select value={materialFilter} onChange={e => setMaterialFilter(e.target.value)} className="mat-filter">
                     <option value="all">All Materials</option>
-                    <option value="plastic">Plastic</option>
-                    <option value="paper">Paper</option>
-                    <option value="metal">Metal</option>
-                    <option value="ewaste">E-Waste</option>
-                    <option value="glass">Glass</option>
+                    <option value="plastic">♻️ Plastic</option>
+                    <option value="paper">📄 Paper</option>
+                    <option value="metal">🔩 Metal</option>
+                    <option value="ewaste">💻 E-Waste</option>
+                    <option value="glass">🍶 Glass</option>
                 </select>
             </div>
 
@@ -64,25 +107,36 @@ const EntityBrowse = ({ onContact }) => {
                         <div className="cc-top">
                             <div className="cc-avatar">{item.name.charAt(0)}</div>
                             <div className="cc-info">
-                                <h3>{item.name} {item.verified && <CheckCircle size={16} color="#10b981" />}</h3>
+                                <h3>{item.name} {item.verified && <CheckCircle size={16} color="#10b981" title="Verified Plant" />}</h3>
                                 <span className="cc-type">
-                                    {showIndustries ? item.industryType : (item.type === 'organization' ? '🏭 Org Collector' : '👤 Individual')}
+                                    {showIndustries ? `🏭 ${item.industryType || 'Recycling Plant'}` : (item.type === 'organization' ? '🏭 Org Collector' : '👤 Individual')}
                                 </span>
                             </div>
                             {!showIndustries && (
                                 <div className="cc-stars">
                                     <Star size={15} fill="#f59e0b" color="#f59e0b" />
-                                    {item.rating} <span className="cc-rev">({item.reviewCount})</span>
+                                    {item.rating || 4.8} <span className="cc-rev">({item.reviewCount || 14})</span>
                                 </div>
                             )}
                         </div>
 
                         <div className="cc-details">
-                            <div className="cc-detail"><MapPin size={14} /> <span>{item.hubLocation || item.location}</span></div>
+                            <div className="cc-detail">
+                                <MapPin size={14} /> <span>{item.hubLocation || item.location || 'India'}</span>
+                            </div>
                             <div className="cc-detail">
                                 <Package size={14} />
-                                <span>{showIndustries ? item.monthlyDemand + ' demand' : item.totalCollected.toLocaleString() + ' kg collected'}</span>
+                                <span style={{ color: showIndustries ? 'var(--accent-mint)' : 'inherit', fontWeight: 600 }}>
+                                    {showIndustries
+                                        ? `Requirement: ${item.monthlyDemand || '50 Tons/month'}`
+                                        : `${(item.totalCollected || 850).toLocaleString()} kg collected`}
+                                </span>
                             </div>
+                            {showIndustries && item.minQuantityRequired && (
+                                <div className="cc-detail" style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                    <span>📦 Min Batch: {item.minQuantityRequired} kg</span>
+                                </div>
+                            )}
                         </div>
 
                         <div className="materials-chips">
@@ -105,7 +159,7 @@ const EntityBrowse = ({ onContact }) => {
                                 </button>
                             )}
                             <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => onContact(item._id, item.name)}>
-                                <MessageSquare size={16} /> {showIndustries ? 'Pitch to' : 'Contact'}
+                                <MessageSquare size={16} /> {showIndustries ? 'Supply Material / Chat' : 'Contact'}
                             </button>
                         </div>
                     </div>

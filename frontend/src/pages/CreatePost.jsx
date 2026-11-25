@@ -41,7 +41,7 @@ const CreatePost = () => {
 
     const [formData, setFormData] = useState({
         title: '', description: '', category: '', condition: 'Good',
-        weight: '', unit: 'kg', priceMin: '', priceMax: '', location: '', pincode: ''
+        weight: '', unit: 'kg', location: '', pincode: ''
     });
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
@@ -146,7 +146,7 @@ const CreatePost = () => {
             return;
         }
 
-        if (!formData.title.trim() || !formData.category || !formData.weight || !formData.priceMin || !formData.location.trim()) {
+        if (!formData.title.trim() || !formData.category || !formData.weight || !formData.location.trim()) {
             setError("Please fill out all required fields marked with *.");
             return;
         }
@@ -352,15 +352,22 @@ const CreatePost = () => {
                             </div>
                         </div>
 
-                        <div className="form-row">
-                            <div className="form-group flex-1">
-                                <label>Min Price (₹/unit) *</label>
-                                <input type="number" name="priceMin" value={formData.priceMin} onChange={handleChange} placeholder="₹ Minimum" required min="0" />
-                            </div>
-                            <div className="form-group flex-1">
-                                <label>Max Price (₹/unit)</label>
-                                <input type="number" name="priceMax" value={formData.priceMax} onChange={handleChange} placeholder="₹ Maximum" min="0" />
-                            </div>
+                        <div className="quote-notice-card" style={{
+                            padding: '0.85rem 1rem',
+                            background: 'rgba(16, 185, 129, 0.08)',
+                            borderRadius: 'var(--radius-md)',
+                            border: '1px solid rgba(16, 185, 129, 0.22)',
+                            margin: '0.5rem 0 1rem 0',
+                            fontSize: '0.84rem',
+                            color: 'var(--text-secondary)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.65rem'
+                        }}>
+                            <Sparkles size={18} color="var(--accent-mint)" style={{ flexShrink: 0 }} />
+                            <span>
+                                <strong>Fair Market Pricing:</strong> As an individual, you do not need to set prices. Verified collection agents in your area will evaluate your material, send competitive price quotes, and negotiate pickup with you directly.
+                            </span>
                         </div>
 
                         <div className="form-row">

@@ -12,7 +12,7 @@ const Sidebar = () => {
 
     const commonLinks = [
         { to: '/dashboard', name: 'Dashboard', icon: <Home size={20} /> },
-        { to: '/marketplace', name: 'Marketplace', icon: <ShoppingBag size={20} /> },
+        { to: '/marketplace', name: user?.role === 'industry' ? 'Collector Stocks' : 'Marketplace', icon: <ShoppingBag size={20} /> },
         { to: '/chat', name: 'Messages', icon: <MessageSquare size={20} /> },
         { to: '/notifications', name: 'Notifications', icon: <Bell size={20} /> },
         { to: '/feedback', name: 'Ratings', icon: <Star size={20} /> },
@@ -24,14 +24,12 @@ const Sidebar = () => {
             { to: '/create-post', name: 'Post Waste', icon: <PlusCircle size={20} /> },
         ],
         collector: [
-            { to: '/create-post', name: 'Post Waste', icon: <PlusCircle size={20} /> },
             { to: '/hub', name: 'My Hub', icon: <Warehouse size={20} /> },
-            { to: '/organizations', name: 'Industries', icon: <Building size={20} /> },
+            { to: '/organizations', name: 'Industry Demand', icon: <Building size={20} /> },
         ],
         industry: [
-            { to: '/create-post', name: 'Post Material Demand', icon: <PlusCircle size={20} /> },
             { to: '/matches', name: 'AI Matches', icon: <Zap size={20} /> },
-            { to: '/collectors', name: 'Collectors', icon: <Package size={20} /> },
+            { to: '/collectors', name: 'Collector Directory', icon: <Package size={20} /> },
         ],
     };
 

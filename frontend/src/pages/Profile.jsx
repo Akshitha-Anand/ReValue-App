@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Star, Package, Award, MapPin, Phone, Mail, Edit3, CheckCircle, MessageSquare, TrendingUp, BarChart2 } from 'lucide-react';
 import { demoPosts, demoTransactions, demoFeedback, demoCollectors } from '../data/demoData';
+import axios from 'axios';
+import API_BASE_URL from '../api';
 import './Profile.css';
 
 const StarRow = ({ rating, size = 16 }) => (
@@ -16,14 +18,27 @@ const StarRow = ({ rating, size = 16 }) => (
 
 const Profile = () => {
     const { id } = useParams();
-    const { user: currentUser } = useAuth();
+    const { user: currentUser, token } = useAuth();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('overview');
     const [viewedUser, setViewedUser] = useState(null);
 
     useEffect(() => {
+        let isMounted = true;
         if (!id) {
             setViewedUser(currentUser);
+            // Fetch live profile with latest collection metrics
+            if (token) {
+                axios.get(`${API_BASE_URL}/api/auth/profile`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+                .then(res => {
+                    if (isMounted && res.data) {
+                        setViewedUser(res.data);
+                    }
+                })
+                .catch(err => console.warn("Live profile fetch fallback:", err.message));
+            }
         } else {
             // Find user in demo data (simulating backend fetch)
             const foundCollector = demoCollectors.find(c => c._id === id);
@@ -42,7 +57,8 @@ const Profile = () => {
                 }
             }
         }
-    }, [id, currentUser]);
+        return () => { isMounted = false; };
+    }, [id, currentUser, token]);
 
     if (!viewedUser) return <div className="loading">Loading Profile...</div>;
 
@@ -55,9 +71,9 @@ const Profile = () => {
     const profileStats = {
         rating: viewedUser.rating || 4.8,
         reviews: viewedUser.reviewCount || 32,
-        transactions: viewedUser.totalPickups || 18,
-        totalWeight: viewedUser.totalCollected ? `${viewedUser.totalCollected} kg` : '210 kg',
-        earnings: viewedUser.totalSpent ? `₹${viewedUser.totalSpent.toLocaleString()}` : '₹4,200'
+        transactions: viewedUser.totalPickups || (viewedUser.role === 'collector' ? 18 : 6),
+        totalWeight: viewedUser.totalCollected ? `${viewedUser.totalCollected.toLocaleString()} kg` : (viewedUser.role === 'collector' ? '850 kg' : '140 kg'),
+        earnings: viewedUser.totalSpent ? `₹${viewedUser.totalSpent.toLocaleString()}` : (viewedUser.role === 'collector' ? '₹4,200' : '₹1,680')
     };
 
     const achievements = [
@@ -208,19 +224,31 @@ const Profile = () => {
 
                 {activeTab === 'transactions' && (
                     <div className="txn-tab glass-pane">
-                        <h2>Transaction History</h2>
+                        <h2>{viewedUser?.role === 'collector' ? 'Waste Purchased & Fulfilled Pickups' : 'Transaction History'}</h2>
                         <div className="table-wrapper">
                             <table className="hub-table">
                                 <thead><tr><th>Date</th><th>Item</th><th>Party</th><th>Weight</th><th>Amount</th><th>Status</th></tr></thead>
-                                <tbody>{demoTransactions.map(t => (
-                                    <tr key={t._id}>
-                                        <td>{t.date}</td><td>{t.postTitle}</td>
-                                        <td>{viewedUser?.role === 'individual' ? t.buyer : t.seller}</td>
-                                        <td>{t.weight}</td>
-                                        <td className="positive">{t.amount}</td>
-                                        <td><span className={`status-chip ${t.status}`}>{t.status}</span></td>
-                                    </tr>
-                                ))}</tbody>
+                                <tbody>
+                                    {viewedUser?.collectionHistory && viewedUser.collectionHistory.map((t, idx) => (
+                                        <tr key={t.postId || idx}>
+                                            <td>{new Date(t.date).toLocaleDateString()}</td>
+                                            <td><strong>{t.title}</strong> ({t.category})</td>
+                                            <td>{t.sellerName || 'Household Seller'}</td>
+                                            <td>{t.weight} {t.unit || 'kg'}</td>
+                                            <td className="positive">₹{t.pricePaid || 0}</td>
+                                            <td><span className="status-chip bought" style={{ background: 'rgba(16,185,129,0.18)', color: '#10b981' }}>✓ Bought</span></td>
+                                        </tr>
+                                    ))}
+                                    {demoTransactions.map(t => (
+                                        <tr key={t._id}>
+                                            <td>{t.date}</td><td>{t.postTitle}</td>
+                                            <td>{viewedUser?.role === 'individual' ? t.buyer : t.seller}</td>
+                                            <td>{t.weight}</td>
+                                            <td className="positive">{t.amount}</td>
+                                            <td><span className={`status-chip ${t.status}`}>{t.status}</span></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
                             </table>
                         </div>
                     </div>

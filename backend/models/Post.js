@@ -9,6 +9,23 @@ const postSchema = new mongoose.Schema({
     unit: String,
     priceMin: Number,
     priceMax: Number,
+    quotedPriceMin: {
+        type: Number,
+        default: null
+    },
+    quotedPriceMax: {
+        type: Number,
+        default: null
+    },
+    quotedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null
+    },
+    quoteNote: {
+        type: String,
+        default: ""
+    },
     location: String,
     pincode: String,
     latitude: {
@@ -42,8 +59,16 @@ const postSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ["available", "requested", "accepted", "reserved", "completed", "cancelled"],
+        enum: ["available", "quoted", "requested", "accepted", "reserved", "bought", "completed", "cancelled"],
         default: "available"
+    },
+    boughtAt: {
+        type: Date,
+        default: null
+    },
+    finalPricePaid: {
+        type: Number,
+        default: null
     },
     collectorId: {
         type: mongoose.Schema.Types.ObjectId,

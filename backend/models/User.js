@@ -31,6 +31,21 @@ const userSchema = new mongoose.Schema({
     operatingHours: String,                             // e.g. "9am-6pm Mon-Sat"
     serviceRadiusKm: { type: Number, default: 5 },     // search radius (default 5 km, configurable)
     isAvailable: { type: Boolean, default: true },      // active status for accepting jobs
+    totalCollected: { type: Number, default: 0 },       // total kilograms of scrap collected
+    totalPickups: { type: Number, default: 0 },         // count of fulfilled pickups
+    totalSpent: { type: Number, default: 0 },           // total rupees spent on buying scrap
+    collectionHistory: [
+        {
+            postId: { type: mongoose.Schema.Types.ObjectId, ref: "Post" },
+            title: String,
+            category: String,
+            weight: Number,
+            unit: String,
+            pricePaid: Number,
+            sellerName: String,
+            date: { type: Date, default: Date.now }
+        }
+    ],
 
     // ─── Location Coordinates (Opt-in) ───────────────
     locationCoordinates: {

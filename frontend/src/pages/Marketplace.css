@@ -348,6 +348,182 @@
     gap: 0.3rem;
 }
 
+/* Badge styles for quote states */
+.price-badge.badge-bought {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: #10b981;
+    color: #34d399;
+}
+
+.price-badge.badge-quoted {
+    background: rgba(245, 158, 11, 0.18);
+    border-color: #f59e0b;
+    color: #fbbf24;
+}
+
+.price-badge.badge-awaiting {
+    background: rgba(148, 163, 184, 0.12);
+    border-color: rgba(148, 163, 184, 0.3);
+    color: #94a3b8;
+    font-size: 0.76rem;
+}
+
+/* Collector Stock Card for Industry View */
+.collector-stock-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.collector-stock-card {
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    transition: all 0.25s ease;
+}
+
+.collector-stock-card:hover {
+    border-color: rgba(16, 185, 129, 0.4);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.csc-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.csc-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: var(--accent-gradient);
+    color: #042f1a;
+    font-weight: 800;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.csc-title-area h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.csc-location {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 3px;
+}
+
+.csc-stock-section {
+    background: rgba(7, 21, 16, 0.65);
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.csc-stock-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+    letter-spacing: 0.5px;
+}
+
+.stock-pills-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.stock-pill {
+    font-size: 0.78rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: var(--radius-sm);
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    color: var(--accent-mint);
+    font-weight: 600;
+}
+
+.csc-metrics-row {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 0.65rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.csc-metric {
+    display: flex;
+    flex-direction: column;
+}
+
+.csc-metric-lbl {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+.csc-metric-val {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.csc-actions {
+    display: flex;
+    gap: 0.65rem;
+    margin-top: auto;
+}
+
+.csc-actions .btn {
+    flex: 1;
+}
+
+/* Quote Modal & Buy Dialog */
+.quote-modal-card {
+    padding: 2rem;
+    max-width: 480px;
+}
+
+.quote-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+}
+
+.quote-modal-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+}
+
+.quote-meta-preview {
+    background: rgba(7, 21, 16, 0.65);
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    margin-bottom: 1.25rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
 @media (max-width: 900px) {
     .marketplace-container {
         flex-direction: column;

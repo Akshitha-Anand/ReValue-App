@@ -261,10 +261,77 @@
 }
 
 .chat-active-name {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     font-weight: 700;
-    margin: 0;
+    margin: 2px 0 0 0;
     color: var(--text-primary);
+}
+
+.chat-role-pill-row {
+    margin-bottom: 2px;
+}
+
+.role-pill-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    text-transform: uppercase;
+}
+
+.role-badge-collector {
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px solid #f59e0b;
+    color: #fbbf24;
+}
+
+.role-badge-industry {
+    background: rgba(168, 85, 247, 0.2);
+    border: 1px solid #a855f7;
+    color: #c084fc;
+}
+
+.role-badge-individual {
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid #10b981;
+    color: #34d399;
+}
+
+.chat-role-indicator-banner {
+    padding: 0.65rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    background: rgba(7, 21, 16, 0.7);
+}
+
+.role-tag-highlight {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: var(--radius-sm);
+}
+
+.role-tag-highlight.role-collector {
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #fde68a;
+}
+
+.role-tag-highlight.role-industry {
+    background: rgba(168, 85, 247, 0.12);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    color: #e9d5ff;
+}
+
+.role-tag-highlight.role-individual {
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #a7f3d0;
 }
 
 .cw-status-row {
